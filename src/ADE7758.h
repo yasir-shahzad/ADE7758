@@ -448,8 +448,7 @@ unsigned char getVersion(void);
   void spiWrite8(unsigned char address,unsigned int value);
   
   private:     //private methods
-  void enableChip(void);  
-  void disableChip(void);
+  void enableChip(bool enable);
 
       
 };

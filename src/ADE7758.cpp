@@ -34,18 +34,10 @@ void ADE7758::Init(void) {
 * @param none
 *
 */
-void ADE7758::enableChip(void){
-	digitalWrite(AFECS,LOW);
-}
-
-
-/** === disableChip ===
-* Disable chip, setting high ChipSelect pin (AFECS)
-* @param none
-*
-*/
-void ADE7758::disableChip(void){
-	digitalWrite(AFECS,HIGH);  
+void ADE7758::enableChip(bool enable) {
+  digitalWrite(AFECS, enable ? 0 : 1);
+  if (enable)
+    delayMicroseconds(50);  // 50 microseconds to power up.
 }
 
 
@@ -58,13 +50,10 @@ void ADE7758::disableChip(void){
 unsigned char ADE7758::spiRead8(unsigned char address){
     unsigned char RegValue0=0;
     
-	enableChip();
-	delayMicroseconds(50);
+	enableChip(true);
 	SPI.transfer(address);
-	delayMicroseconds(50);
 	RegValue0 = SPI.transfer(0x00);
-	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
     
 	return (RegValue0);
 }
@@ -80,7 +69,7 @@ unsigned int ADE7758::spiRead16(unsigned char address){
     unsigned int _16BitValue=0;
     unsigned char ReadValue,RegValue1,RegValue2;
 
-	enableChip();
+	enableChip(true);
 	delayMicroseconds(50);
 	SPI.transfer(address);
 	delayMicroseconds(50);
@@ -88,7 +77,7 @@ unsigned int ADE7758::spiRead16(unsigned char address){
 	delayMicroseconds(50);
 	RegValue2 = SPI.transfer(0x00);
 	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
     _16BitValue = RegValue1;
 	_16BitValue <<= 8;
 	_16BitValue |= RegValue2;
@@ -106,7 +95,7 @@ unsigned long ADE7758::spiRead24(unsigned char address){
     long _24bitValue = 0;
 	unsigned char RegValue0,RegValue1,RegValue2;
 
-	enableChip();
+	enableChip(true);
 	delayMicroseconds(50);
 	SPI.transfer(address);
 	delayMicroseconds(50);
@@ -116,7 +105,7 @@ unsigned long ADE7758::spiRead24(unsigned char address){
 	delayMicroseconds(50);
 	RegValue2 = SPI.transfer(0x00);
 	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
     
     _24bitValue = RegValue0 ;
 	_24bitValue <<=  16;
@@ -138,13 +127,13 @@ void ADE7758::spiWrite8(unsigned char address,unsigned int value){
 	address |= WRITE;
 	a1 = (unsigned char)value;
     
-	enableChip();
+	enableChip(true);
 	delayMicroseconds(50);
 	SPI.transfer((unsigned char)address);          //register selection
 	delayMicroseconds(50);
 	SPI.transfer((unsigned char)a1);
 	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
 }
 
 
@@ -160,7 +149,7 @@ void ADE7758::spiWrite16(unsigned char address,unsigned int value){
     a2 = (unsigned char)value;
 
 	address |= WRITE;
-    enableChip();
+    enableChip(true);
 	delayMicroseconds(50);
 	SPI.transfer((unsigned char)address);    
 	delayMicroseconds(50);    
@@ -168,7 +157,7 @@ void ADE7758::spiWrite16(unsigned char address,unsigned int value){
 	delayMicroseconds(50);
 	SPI.transfer(a2);  
 	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
 }
 
 void ADE7758::spiWrite24(unsigned char address, unsigned long value){
@@ -179,7 +168,7 @@ void ADE7758::spiWrite24(unsigned char address, unsigned long value){
 	a3 = (unsigned char)value;
 	address |= WRITE;
 
-	enableChip();
+	enableChip(true);
 	delayMicroseconds(50);
 	SPI.transfer((unsigned char)address);    
 	delayMicroseconds(50);    
@@ -189,7 +178,7 @@ void ADE7758::spiWrite24(unsigned char address, unsigned long value){
 	delayMicroseconds(50);
 	SPI.transfer(a3);  
 	delayMicroseconds(50);
-	disableChip();
+	enableChip(false);
 }
 
 
